@@ -1,6 +1,7 @@
 ---
 title: Một ngày lý tưởng
 published: true
+technology: false
 date: 2019-07-19 19:24:20
 tags: talk, plan
 description: Kể về một ngày lý tưởng mà mình luôn ao ước và cố thực hiện. 

@@ -1,6 +1,7 @@
 ---
 title: Ownership trong Rust
 published: true
+technology: true
 date: 2019-07-07 20:14:20
 tags: rust, learning, challenge
 description: Tính năng ownership trong Rust 

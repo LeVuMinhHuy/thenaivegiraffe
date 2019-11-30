@@ -36,6 +36,7 @@ struct Shared {
 struct Metadata {
     title: String,
     published: String,
+    technology: String,
     date: String,
     description: String,
     image: String,
@@ -155,6 +156,7 @@ fn parse_metadata(path: &Path) -> Metadata {
     let mut metadata = Metadata {
         title: format!(""),
         published: format!("false"),
+        technology: format!(""),
         date: format!(""),
         description: format!(""),
         image: format!(""),
@@ -177,6 +179,9 @@ fn parse_metadata(path: &Path) -> Metadata {
             }
             else if line.starts_with("published: ") {
                 metadata.published = line.replace("published: ", "");
+            }
+            else if line.starts_with("technology: ") {
+                metadata.technology = line.replace("technology: ", "");
             }
             else if line.starts_with("date: ") {
                 metadata.date = line.replace("date: ", "");
@@ -211,12 +216,19 @@ fn generate_index_page(posts: &Vec<Metadata>) {
             } else {
                 ""
             };
-            format!("<div class='home-list-item'><span class='home-date-indicator'>{}</span>{}{}<br/><a href='/posts/{}'>{}</a></div>", post_date_text, guest_tag, tag_list, file_name, p.title)
+
+            if p.technology.eq("true"){
+                format!("<div class='home-list-item'><span class='home-date-indicator'>{}</span>{}{}<br/><a href='/posts/{}'>{}</a></div>", post_date_text, guest_tag, tag_list, file_name, p.title)
+            }
+            else{
+                format!("")
+            }
         }).collect();
         let markdown = html.join("\n");
         let mut post = Metadata {
             title: "Index".to_string(),
             published: format!("true"),
+            technology: format!("true"),
             date: "".to_string(),
             description: "".to_string(),
             image: "".to_string(),
@@ -227,6 +239,49 @@ fn generate_index_page(posts: &Vec<Metadata>) {
         };
         post.output_html = apply_template(&template, &post, "", None);
         let _ = save_as_html(&post.output_html, &PathBuf::from("./index.html"));
+    }
+}
+
+
+
+fn generate_productivity_page(posts: &Vec<Metadata>) {
+    //dotenv().ok();
+    let date_format = env::var("DATE_FORMAT").unwrap();
+    let domain_name = env::var("DOMAIN_NAME").unwrap();
+    if let Ok(template) = load_template("index") {
+        let html: Vec<String> = posts.into_iter().map(|p| {
+            let file_name = p.output_file.file_name().unwrap().to_str().unwrap();
+            let post_date = Utc.datetime_from_str(&p.date, TIME_FORMAT).unwrap();
+            let post_date_text = post_date.format(&date_format);
+            let tag_list = &p.tags.join(", ");
+            let guest_tag = if p.published.eq("guest") {
+                "<span class='guest-post'>Guest Post</span>"
+            } else {
+                ""
+            };
+
+            if p.technology.eq("false"){
+                format!("<div class='home-list-item'><span class='home-date-indicator'>{}</span>{}{}<br/><a href='/posts/{}'>{}</a></div>", post_date_text, guest_tag, tag_list, file_name, p.title)
+            }
+            else{
+                format!("")
+            }
+        }).collect();
+        let markdown = html.join("\n");
+        let mut post = Metadata {
+            title: "Productivity".to_string(),
+            published: format!("true"),
+            technology: format!("true"),
+            date: "".to_string(),
+            description: "".to_string(),
+            image: "".to_string(),
+            tags: vec![],
+            markdown: markdown,
+            output_file: PathBuf::from("./productivity.html"),
+            output_html: format!("")
+        };
+        post.output_html = apply_template(&template, &post, "", None);
+        let _ = save_as_html(&post.output_html, &PathBuf::from("./productivity.html"));
     }
 }
 
@@ -241,6 +296,7 @@ fn generate_tags_page(tags: &HashMap<String, Vec<Article>>) {
             let post = Metadata {
                 title: format!("{}", &key),
                 published: format!("true"),
+                technology: format!("true"),
                 date: "".to_string(),
                 description: "".to_string(),
                 image: "".to_string(),
@@ -372,6 +428,7 @@ fn main() {
 
                 println!("Total {} posts", posts.len());
                 generate_index_page(&posts);
+                generate_productivity_page(&posts);
 
                 println!("Tags: {:?}", shared.tags);
                 generate_tags_page(&shared.tags);
@@ -395,7 +452,7 @@ fn main() {
                     (GET) (/view/{file_name: String}) => {
                         if let Ok(template) = load_template("preview") {
                             let mut shared = Shared { tags: HashMap::new() };
-                            let path = PathBuf::from(format!("./posts/{}.md", file_name));
+                            let path = PathBuf::from(format!("./posts/writing/{}.md", file_name));
                             let abs_path = fs::canonicalize(&path).unwrap();
                             if let Some(post) = parse_post(&template, &shared, &PathBuf::from(abs_path), true) {
                                 let output = post.output_html.replace("\"img", "\"/posts/img").to_string();
@@ -411,3 +468,4 @@ fn main() {
         }
     }
 }
+
