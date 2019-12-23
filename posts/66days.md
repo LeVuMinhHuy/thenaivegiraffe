@@ -10,7 +10,7 @@ image: https://www.the1thing.com/wp-content/uploads/2016/07/TheONEThing_66DayCha
 
 ## 66 ngày 
 ### là gì ?
-**Thử thách 66 ngày** là một bộ thử  thách tương đối khắc nghiệt, do mình đặt ra, được mình cố gắng thực hiện trong 66 ngày, nhằm cải thiện cuộc sống của mình.
+**Thử thách 66 ngày** là một bộ thử  thách <s>tương đối khắc nghiệt</s>, do mình đặt ra, được mình cố gắng thực hiện trong 66 ngày, nhằm cải thiện cuộc sống của mình.
 ### về ?
 những thói quen tốt mà mình muốn cải thiện.
 
